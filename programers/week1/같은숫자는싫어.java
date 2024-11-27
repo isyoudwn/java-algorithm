@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Solution {
+class Solution {
     public int[] solution(int[] arr) {
         List<Integer> answer = new ArrayList<>();
         Deque<Integer> deque = new ArrayDeque<>();
