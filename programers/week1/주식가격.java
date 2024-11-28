@@ -3,7 +3,6 @@ import java.util.*;
 class Solution {
     public int[] solution(int[] prices) {
         Deque<Integer> deque = new ArrayDeque<>();
-        Deque<Integer> stack = new ArrayDeque<>();
         ArrayList<Integer> answer = new ArrayList<>();
         int N = prices.length;
         
