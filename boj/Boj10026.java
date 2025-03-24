@@ -25,7 +25,7 @@ class Main {
 
         int normal = 0;
         int redGreen = 0;
-        for (int i = 0; i < N; i++) {`
+        for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 if (!graphNormal[i][j].equals("V")) {
                     bfs(i, j, graphNormal, graphNormal[i][j]);
