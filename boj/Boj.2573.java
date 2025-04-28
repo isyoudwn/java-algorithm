@@ -1,8 +1,10 @@
+package org.example;
+
 import java.io.*;
 import java.util.*;
 
-class Main {
-    public static int solution() throws Exception {
+public class Main {
+    public static void solution() throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
@@ -15,6 +17,7 @@ class Main {
         int[][] next = new int[n][m];
         Map<Integer, Set<Integer>> visited = new HashMap<>();
 
+        // setting
         for (int i = 0; i < n; i++) {
             StringTokenizer temp = new StringTokenizer(br.readLine());
 
@@ -27,78 +30,78 @@ class Main {
         }
 
         int year = 0;
+
+        // main logic
         while (true) {
-            year++;
-            boolean flag2 = false;
+            // vistied 초기화
+            for (int i = 0; i < graph.length; i++) {
+                visited.get(i).clear();
+            }
+
             int count = 0;
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < m; j++) {
-                    // 빙하 pass
+
+            // 빙산 개수 탐색
+            for (int i = 0; i < graph.length; i++) {
+                for (int j = 0; j < graph[0].length; j++) {
                     if (graph[i][j] == 0) {
                         continue;
                     }
-                    // 방문 노드 pass
-                    flag2 = true;
                     if (visited.get(i).contains(j)) {
                         continue;
                     }
-
                     count++;
-                    if (count >= 2) {
-                        return year;
-                    }
-
-                    bfs(visited, graph, next, i, j);
+                    bfs(graph, i, j, visited, next);
                 }
             }
 
-            graph = next;
+            if (count >= 2) {
+                System.out.println(year);
+                return;
+            }
+            if (count == 0) {
+                System.out.println(0);
+                return;
+            }
 
-            if (!flag2) {
-                return 0;
+            // 녹이고 next 저장
+            for (int i = 0; i < graph.length; i++) {
+                for (int j = 0; j < graph[0].length; j++) {
+                    if (graph[i][j] == 0) {
+                        next[i][j] = 0;
+                        continue;
+                    }
+                    next[i][j] = countSeaArea(graph, i, j);
+                }
             }
-            // 방문 노드 clear
-            for (int key : visited.keySet()) {
-                visited.get(key).clear();
+
+            // graph에 next 복사
+            for (int i = 0; i < graph.length; i++) {
+                for (int j = 0; j < graph[0].length; j++) {
+                    graph[i][j] = next[i][j];
+                }
             }
+            year++;
         }
     }
 
-    public static void bfs(Map<Integer, Set<Integer>> visited, int[][] graph, int[][] next, int startX, int startY) {
-        Deque<int[]> deque = new ArrayDeque<>();
-        // now도 빙하 계산하기
-        deque.add(new int[]{startX, startY});
-        visited.get(startX).add(startY);
 
+    public static void bfs(int[][] graph, int startX, int startY, Map<Integer, Set<Integer>> visited,
+                           int[][] nextYear) {
+        Deque<int[]> deque = new ArrayDeque<>();
         int[] dx = {-1, 1, 0, 0};
         int[] dy = {0, 0, -1, 1};
 
-        // 시작 지점의 년도 별 녹는 거 계산
-        for (int k = 0; k < 4; k++) {
-            int x = startX + dx[k];
-            int y = startY + dy[k];
-
-            // 범위 벗어 날 경우
-            if (x < 0 || x >= graph.length || y < 0 || y >= graph[0].length) {
-                continue;
-            }
-            // 0에 의해서 녹는 것을 반영
-            if (graph[x][y] != 0) {
-                continue;
-            }
-            next[startX][startY] = Math.max(0, next[startX][startY] - 1);
-        }
+        deque.add(new int[]{startX, startY});
+        visited.get(startX).add(startY);
 
         while (!deque.isEmpty()) {
             int[] now = deque.removeFirst();
-            int nowX = now[0];
-            int nowY = now[1];
 
             for (int i = 0; i < 4; i++) {
-                int nextX = nowX + dx[i];
-                int nextY = nowY + dy[i];
+                int nextX = now[0] + dx[i];
+                int nextY = now[1] + dy[i];
 
-                if (nextX < 0 || nextX >= graph.length || nextY < 0 || nextY >= graph[0].length) {
+                if (nextX < 0 || nextY < 0 || nextX >= graph.length || nextY >= graph[0].length) {
                     continue;
                 }
                 if (graph[nextX][nextY] == 0) {
@@ -107,30 +110,36 @@ class Main {
                 if (visited.get(nextX).contains(nextY)) {
                     continue;
                 }
-
-                // 방문 처리
                 visited.get(nextX).add(nextY);
-
-                // 년도 별 녹는 거 계산
-                for (int k = 0; k < 4; k++) {
-                    int x = nextX + dx[k];
-                    int y = nextY + dy[k];
-
-                    // 범위 벗어 날 경우
-                    if (x < 0 || x >= graph.length || y < 0 || y >= graph[0].length) {
-                        continue;
-                    }
-                    // 0에 의해서 녹는 것을 반영
-                    if (graph[x][y] != 0) {
-                        continue;
-                    }
-                    next[nextX][nextY] = Math.max(0, next[nextX][nextY] - 1);
-                }
+                deque.add(new int[]{nextX, nextY});
             }
         }
     }
 
+    // 바닷물로 인한 빙산 높이 계산
+    public static int countSeaArea(int[][] graph, int nowX, int nowY) {
+        int[] dx = {-1, 1, 0, 0};
+        int[] dy = {0, 0, -1, 1};
+
+        int count = 0;
+
+        for (int i = 0; i < 4; i++) {
+            int x = nowX + dx[i];
+            int y = nowY + dy[i];
+
+            if (x < 0 || y < 0 || x >= graph.length || y >= graph[0].length) {
+                continue;
+            }
+            if (graph[x][y] != 0) {
+                continue;
+            }
+            count++;
+        }
+        return Math.max(0, graph[nowX][nowY] - count);
+    }
+
     public static void main(String[] args) throws Exception {
-        System.out.print(solution());
+        solution();
     }
 }
+
