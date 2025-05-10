@@ -2,87 +2,93 @@ import java.io.*;
 import java.util.*;
 
 class Main {
-
-    public static void solution() throws IOException {
+    public static void solution() throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        StringBuilder sb = new StringBuilder();
 
-        // 행
         int N = Integer.parseInt(st.nextToken());
-        // 열
         int M = Integer.parseInt(st.nextToken());
-        int X = Integer.parseInt(st.nextToken());
-        int Y = Integer.parseInt(st.nextToken());
-        int operationsCount = Integer.parseInt(st.nextToken());
-        int[][] graph = new int[N][M];
+        int startX = Integer.parseInt(st.nextToken());
+        int startY = Integer.parseInt(st.nextToken());
+        int operations = Integer.parseInt(st.nextToken());
 
-        int[] dice = new int[6]; // [윗면, 바닥면, 북쪽면, 남쪽면, 서쪽면, 동쪽면]
+        int[][] graph = new int[N][M];
 
         for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
+
             for (int j = 0; j < M; j++) {
                 graph[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        int nowX = X;
-        int nowY = Y;
+        int nextX = startX;
+        int nextY = startY;
 
         int[] dx = {0, 0, -1, 1};
         int[] dy = {1, -1, 0, 0};
 
         st = new StringTokenizer(br.readLine());
 
-        for (int i = 0; i < operationsCount; i++) {
-            int direct = Integer.parseInt(st.nextToken()) - 1;
+        StringBuilder sb = new StringBuilder();
+        // 위, 남, 동, 서, 북, 아래
+        int[] dice = {0, 0, 0, 0, 0, 0};
 
-            int nextX = nowX + dx[direct];
-            int nextY = nowY + dy[direct];
+        for (int i = 0; i < operations; i++) {
+            int operation = Integer.parseInt(st.nextToken()) - 1;
+            int tempX = nextX + dx[operation];
+            int tempY = nextY + dy[operation];
 
-            // 올바르지 않은 경우
-            if (nextX < 0 || nextY < 0 || nextX > N - 1 || nextY > M - 1) {
+            if (tempX < 0 || tempY < 0 || tempX > N - 1 || tempY > M - 1) {
                 continue;
             }
-            
-            // [윗면, 바닥면, 북쪽면, 남쪽면, 서쪽면, 동쪽면]
-            if (direct == 0) { // 동쪽
-                int temp = dice[0];
-                dice[0] = dice[4];
-                dice[4] = dice[1];
-                dice[1] = dice[5];
-                dice[5] = temp;
-            } else if (direct == 1) { // 서쪽
-                int temp = dice[0];
-                dice[0] = dice[5];
-                dice[5] = dice[1];
-                dice[1] = dice[4];
-                dice[4] = temp;
-            } else if (direct == 2) { // 북쪽
-                int temp = dice[0];
-                dice[0] = dice[2];
-                dice[2] = dice[1];
-                dice[1] = dice[3];
-                dice[3] = temp;
-            } else if (direct == 3) { // 남쪽
+            nextX = tempX;
+            nextY = tempY;
+
+            // 동
+            // 위, 남, 동, 서, 북, 아래
+            if (operation == 0) {
                 int temp = dice[0];
                 dice[0] = dice[3];
-                dice[3] = dice[1];
-                dice[1] = dice[2];
+                dice[3] = dice[5];
+                dice[5] = dice[2];
                 dice[2] = temp;
+            }
+            // 서
+            if (operation == 1) {
+                int temp = dice[0];
+                dice[0] = dice[2];
+                dice[2] = dice[5];
+                dice[5] = dice[3];
+                dice[3] = temp;
+            }
+            // 북
+            if (operation == 2) {
+                int temp = dice[0];
+                dice[0] = dice[1];
+                dice[1] = dice[5];
+                dice[5] = dice[4];
+                dice[4] = temp;
+            }
+            // 남
+            if (operation == 3) {
+                int temp = dice[0];
+                dice[0] = dice[4];
+                dice[4] = dice[5];
+                dice[5] = dice[1];
+                dice[1] = temp;
             }
 
             if (graph[nextX][nextY] == 0) {
-                graph[nextX][nextY] = dice[1];  // 바닥면 값 복사
+                graph[nextX][nextY] = dice[5];
             } else {
-                dice[1] = graph[nextX][nextY];  // 바닥면에 칸 값 복사
+                dice[5] = graph[nextX][nextY];
+                graph[nextX][nextY] = 0;
             }
 
-            sb.append(dice[0]).append("\n");
-            nowX = nextX;
-            nowY = nextY;
+            sb.append(dice[0]);
+            sb.append("\n");
         }
-
         System.out.print(sb);
     }
 
