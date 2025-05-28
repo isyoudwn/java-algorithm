@@ -20,7 +20,7 @@ class Main {
             //x y
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
-
+`
             //x y
             int c = Integer.parseInt(st.nextToken());
             int d = Integer.parseInt(st.nextToken());
